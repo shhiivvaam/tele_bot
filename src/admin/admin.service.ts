@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -13,20 +13,41 @@ export class AdminService {
     }
 
     async getUsers() {
-        // Replace with actual database logic
-        return this.users;
+        try {
+            // Replace with actual database query, e.g., `return await this.userRepository.find();`
+            return this.users;
+        } catch (error) {
+            throw new NotFoundException('Could not retrieve users');
+        }
     }
 
     async blockUser(id: string) {
         // Replace with actual database logic to block user
         const user = this.users.find(user => user.id === id);
-        if (user) {
-            user.blocked = true;
+        if (!user) {
+            throw new NotFoundException(`User with ID ${id} not found`);
         }
+        user.blocked = true;
+
+        // Database example:
+        // const user = await this.userRepository.findOne(id);
+        // if (!user) throw new NotFoundException(`User with ID ${id} not found`);
+        // user.blocked = true;
+        // await this.userRepository.save(user);
     }
 
     async deleteUser(id: string) {
         // Replace with actual database logic to delete user
-        this.users = this.users.filter(user => user.id !== id);
+        const userIndex = this.users.findIndex(user => user.id === id);
+        if (userIndex === -1) {
+            throw new NotFoundException(`User with ID ${id} not found`);
+        }
+        this.users.splice(userIndex, 1);
+
+        // Database example:
+        // const deleteResult = await this.userRepository.delete(id);
+        // if (deleteResult.affected === 0) {
+        //   throw new NotFoundException(`User with ID ${id} not found`);
+        // }
     }
 }
