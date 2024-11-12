@@ -15,7 +15,7 @@ export class AdminController {
     async googleAuthRedirect(@Req() req, @Res() res) {
         try {
             const jwt = this.adminService.generateJwt(req.user);
-            res.redirect(`${process.env.BACKEND_URL}/dashboard?token=${jwt}`);
+            res.redirect(`${process.env.FRONTEND_URL}/dashboard?token=${jwt}`);
         } catch (error) {
             res.status(HttpStatus.INTERNAL_SERVER_ERROR).send('Login failed');
         }
